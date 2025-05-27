@@ -1,50 +1,47 @@
-# Welcome to your Expo app 👋
+# Wallify
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native Expo app that allows users to create a to-do list and generate a stylized image of that list, sized specifically for the iPhone 14 lock screen (1170x2532 pixels).
 
-## Get started
+## Features
 
-1. Install dependencies
+- Create and manage a to-do list with a simple, modern UI
+- Generate a stylized image of your to-do list formatted for iPhone lock screens
+- Save the generated image to your photo library
+- Instructions for setting the image as your lock screen wallpaper
 
-   ```bash
-   npm install
-   ```
+## Getting Started
 
-2. Start the app
+### Prerequisites
 
-   ```bash
-   npx expo start
-   ```
+- Node.js
+- npm or yarn
+- Expo Go app on your iOS device (for testing)
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### Installation
 
 ```bash
-npm run reset-project
+# Install dependencies
+npm install
+
+# Start the development server
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Usage
 
-## Learn more
+1. Add items to your to-do list using the input field and "Add" button
+2. Click "Generate Lock Screen Image" to preview your to-do list as a wallpaper
+3. On the preview screen, tap "Save to Photos" to save the image to your photo library
+4. Follow the instructions to set the image as your lock screen wallpaper
 
-To learn more about developing your project with Expo, look at the following resources:
+## Technologies Used
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- React Native
+- Expo
+- react-native-view-shot (for capturing the view as an image)
+- expo-media-library (for saving the image to the photo library)
+- @react-navigation/native (for navigation between screens)
 
-## Join the community
+## License
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under the MIT License

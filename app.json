@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "wallify",
+    "name": "Wallify",
     "slug": "wallify",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,6 +8,7 @@
     "scheme": "wallify",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "description": "Create stylized to-do list wallpapers for your iPhone lock screen",
     "ios": {
       "supportsTablet": true
     },
@@ -16,7 +17,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -33,10 +38,21 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-media-library"
+    ],
+    "permissions": [
+      "MEDIA_LIBRARY",
+      "MEDIA_LIBRARY_WRITE_ONLY"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "588bf8e6-2032-4a9d-a16a-815598d1281a"
+      }
     }
   }
 }
