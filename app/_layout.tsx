@@ -22,16 +22,44 @@ export default function Layout(): React.ReactElement {
         }}
       >
         <Stack.Screen 
+          name="index" 
+          options={{ 
+            title: 'Welcome to Wallify',
+            headerShown: false,
+          }} 
+        />
+        <Stack.Screen 
+          name="welcome" 
+          options={{ 
+            title: 'Choose Category',
+            headerShown: false,
+          }} 
+        />
+        <Stack.Screen 
           name="todo" 
           options={{ 
-            title: 'Wallify',
-            headerShown: false,
+            title: 'Tasks',
+            headerBackTitle: 'Back',
+          }} 
+        />
+        <Stack.Screen 
+          name="grocery" 
+          options={{ 
+            title: 'Grocery List',
+            headerBackTitle: 'Back',
           }} 
         />
         <Stack.Screen 
           name="preview" 
           options={{ 
             title: 'Preview',
+            headerBackTitle: 'Back',
+          }} 
+        />
+        <Stack.Screen 
+          name="grocery-preview" 
+          options={{ 
+            title: 'Grocery Preview',
             headerBackTitle: 'Back',
           }} 
         />

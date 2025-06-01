@@ -4,14 +4,15 @@ import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    Alert,
-    Dimensions,
-    Linking,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  Dimensions,
+  Linking,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 
@@ -193,6 +194,9 @@ export default function GroceryPreviewScreen(): React.ReactElement {
     }
   };
 
+  // Add this helper function to determine if scrolling is needed
+  const shouldEnableScroll = groceryList.length > 2;
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -207,195 +211,392 @@ export default function GroceryPreviewScreen(): React.ReactElement {
         <View style={styles.headerRight} />
       </View>
 
-      <ViewShot
-        ref={viewShotRef}
-        options={{
-          format: 'png',
-          quality: 1,
-          width: IPHONE_13_WIDTH,
-          height: IPHONE_13_HEIGHT,
-        }}
-        style={styles.previewContainer}
-      >
-        {/* Dynamic Background */}
-        <LinearGradient
-          colors={backgroundOptions[selectedBackground].colors}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.dynamicBackground}
+      {/* Conditional ScrollView wrapper */}
+      {shouldEnableScroll ? (
+        <ScrollView 
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          {/* Shopping Widget Container */}
-          <View style={styles.widgetContainer}>
-            {/* Widget Background */}
-            <View style={styles.widgetBackground}>
-              {/* Widget Header */}
-              <View style={styles.widgetHeader}>
-                <View style={styles.headerLeft}>
-                  <View style={styles.appIconContainer}>
-                    <Text style={styles.appIcon}>🛒</Text>
+          <ViewShot
+            ref={viewShotRef}
+            options={{
+              format: 'png',
+              quality: 1,
+              width: IPHONE_13_WIDTH,
+              height: IPHONE_13_HEIGHT,
+            }}
+            style={styles.previewContainer}
+          >
+            {/* Dynamic Background */}
+            <LinearGradient
+              colors={backgroundOptions[selectedBackground].colors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.dynamicBackground}
+            >
+              {/* Shopping Widget Container */}
+              <View style={styles.widgetContainer}>
+                {/* Widget Background */}
+                <View style={styles.widgetBackground}>
+                  {/* Widget Header */}
+                  <View style={styles.widgetHeader}>
+                    <View style={styles.headerLeft}>
+                      <View style={styles.appIconContainer}>
+                        <Text style={styles.appIcon}>🛒</Text>
+                      </View>
+                      <View style={styles.headerTextContainer}>
+                        <Text style={styles.widgetTitle}>Shopping List</Text>
+                        <Text style={styles.widgetSubtitle}>{getCurrentDate()}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.moreButton}>
+                      <Text style={styles.moreButtonText}>•••</Text>
+                    </View>
                   </View>
-                  <View style={styles.headerTextContainer}>
-                    <Text style={styles.widgetTitle}>Shopping List</Text>
-                    <Text style={styles.widgetSubtitle}>{getCurrentDate()}</Text>
-                  </View>
-                </View>
-                <View style={styles.moreButton}>
-                  <Text style={styles.moreButtonText}>•••</Text>
-                </View>
-              </View>
 
-              {/* Shopping Stats */}
-              <View style={styles.statsContainer}>
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{totalItems}</Text>
-                  <Text style={styles.statLabel}>Items</Text>
-                </View>
-                <View style={styles.statDivider} />
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{checkedItems}</Text>
-                  <Text style={styles.statLabel}>Collected</Text>
-                </View>
-                {urgentItems > 0 && (
-                  <>
+                  {/* Shopping Stats */}
+                  <View style={styles.statsContainer}>
+                    <View style={styles.statItem}>
+                      <Text style={styles.statNumber}>{totalItems}</Text>
+                      <Text style={styles.statLabel}>Items</Text>
+                    </View>
                     <View style={styles.statDivider} />
                     <View style={styles.statItem}>
-                      <Text style={[styles.statNumber, styles.urgentNumber]}>
-                        {urgentItems}
-                      </Text>
-                      <Text style={styles.statLabel}>Urgent</Text>
+                      <Text style={styles.statNumber}>{checkedItems}</Text>
+                      <Text style={styles.statLabel}>Collected</Text>
                     </View>
-                  </>
-                )}
-              </View>
+                    {urgentItems > 0 && (
+                      <>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statItem}>
+                          <Text style={[styles.statNumber, styles.urgentNumber]}>
+                            {urgentItems}
+                          </Text>
+                          <Text style={styles.statLabel}>Urgent</Text>
+                        </View>
+                      </>
+                    )}
+                  </View>
 
-              {/* Shopping Items */}
-              <View style={styles.widgetContent}>
-                {groceryList.slice(0, 4).map((item, index) => {
-                  const categoryInfo = getCategoryInfo(item.category);
-                  return (
-                    <View key={item.id || index} style={styles.shoppingItem}>
-                      <View style={styles.itemCheckbox}>
-                        <View style={[
-                          styles.checkboxInner,
-                          item.checked ? styles.completedCheckbox : styles.uncompletedCheckbox
-                        ]}>
-                          {item.checked ? (
-                            <Text style={styles.checkboxCheck}>✓</Text>
-                          ) : (
-                            <View style={styles.emptyCheckbox} />
-                          )}
-                        </View>
-                      </View>
-                      
-                      <View style={styles.itemContent}>
-                        <View style={styles.itemMainContent}>
-                          <Text style={styles.categoryEmoji}>
-                            {categoryInfo.emoji}
-                          </Text>
-                          <Text 
-                            style={[
-                              styles.itemText, 
-                              item.checked && styles.completedItemText
-                            ]} 
-                            numberOfLines={1}
-                          >
-                            {item.name}
-                          </Text>
-                          {item.priority === 'urgent' && !item.checked && (
-                            <View style={styles.urgentIndicator}>
-                              <Text style={styles.urgentText}>!</Text>
+                  {/* Shopping Items */}
+                  <View style={styles.widgetContent}>
+                    {groceryList.slice(0, 4).map((item, index) => {
+                      const categoryInfo = getCategoryInfo(item.category);
+                      return (
+                        <View key={item.id || index} style={styles.shoppingItem}>
+                          <View style={styles.itemCheckbox}>
+                            <View style={[
+                              styles.checkboxInner,
+                              item.checked ? styles.completedCheckbox : styles.uncompletedCheckbox
+                            ]}>
+                              {item.checked ? (
+                                <Text style={styles.checkboxCheck}>✓</Text>
+                              ) : (
+                                <View style={styles.emptyCheckbox} />
+                              )}
                             </View>
-                          )}
+                          </View>
+                          
+                          <View style={styles.itemContent}>
+                            <View style={styles.itemMainContent}>
+                              <Text style={styles.categoryEmoji}>
+                                {categoryInfo.emoji}
+                              </Text>
+                              <Text 
+                                style={[
+                                  styles.itemText, 
+                                  item.checked && styles.completedItemText
+                                ]} 
+                                numberOfLines={1}
+                              >
+                                {item.name}
+                              </Text>
+                              {item.priority === 'urgent' && !item.checked && (
+                                <View style={styles.urgentIndicator}>
+                                  <Text style={styles.urgentText}>!</Text>
+                                </View>
+                              )}
+                            </View>
+                            
+                            <View style={styles.itemMeta}>
+                              <Text style={[
+                                styles.quantityText,
+                                item.checked && styles.completedQuantityText
+                              ]}>
+                                Qty: {item.quantity}
+                              </Text>
+                            </View>
+                          </View>
                         </View>
-                        
-                        <View style={styles.itemMeta}>
-                          <Text style={[
-                            styles.quantityText,
-                            item.checked && styles.completedQuantityText
-                          ]}>
-                            Qty: {item.quantity}
-                          </Text>
-                        </View>
+                      );
+                    })}
+                    
+                    {/* Show more indicator */}
+                    {groceryList.length > 4 && (
+                      <View style={styles.moreItemsIndicator}>
+                        <Text style={styles.moreItemsText}>
+                          +{groceryList.length - 4} more items
+                        </Text>
                       </View>
-                    </View>
-                  );
-                })}
-                
-                {/* Show more indicator */}
-                {groceryList.length > 4 && (
-                  <View style={styles.moreItemsIndicator}>
-                    <Text style={styles.moreItemsText}>
-                      +{groceryList.length - 4} more items
+                    )}
+                  </View>
+
+                  {/* Widget Footer */}
+                  <View style={styles.widgetFooter}>
+                    <Text style={styles.footerText}>
+                      {Math.round((checkedItems / Math.max(totalItems, 1)) * 100)}% collected
+                      {urgentItems > 0 && ` • ${urgentItems} urgent`}
                     </Text>
                   </View>
-                )}
+                </View>
               </View>
+            </LinearGradient>
+          </ViewShot>
 
-              {/* Widget Footer */}
-              <View style={styles.widgetFooter}>
-                <Text style={styles.footerText}>
-                  {Math.round((checkedItems / Math.max(totalItems, 1)) * 100)}% collected
-                  {urgentItems > 0 && ` • ${urgentItems} urgent`}
-                </Text>
+          {/* Controls Section - now inside ScrollView */}
+          <View style={styles.scrollableButtonsContainer}>
+            {/* Background Selection */}
+            <View style={styles.colorSelectionContainer}>
+              <Text style={styles.sectionTitle}>Choose Background</Text>
+              <View style={styles.colorCards}>
+                {backgroundOptions.map((option, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.colorCard,
+                      selectedBackground === index && styles.selectedColorCard
+                    ]}
+                    onPress={() => setSelectedBackground(index)}
+                  >
+                    <LinearGradient
+                      colors={option.colors}
+                      style={styles.colorPreview}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    />
+                    <Text style={styles.colorName}>{option.name}</Text>
+                    {selectedBackground === index && (
+                      <View style={styles.selectedIndicator}>
+                        <Text style={styles.checkmark}>✓</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
-          </View>
-        </LinearGradient>
-      </ViewShot>
 
-      {/* Controls Section */}
-      <View style={styles.buttonsContainer}>
-        {/* Background Selection */}
-        <View style={styles.colorSelectionContainer}>
-          <Text style={styles.sectionTitle}>Choose Background</Text>
-          <View style={styles.colorCards}>
-            {backgroundOptions.map((option, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.colorCard,
-                  selectedBackground === index && styles.selectedColorCard
-                ]}
-                onPress={() => setSelectedBackground(index)}
+            {/* Save Button */}
+            <TouchableOpacity 
+              style={[styles.saveButton, imageSaved && styles.savedButton]} 
+              onPress={saveAndApplyWallpaper}
+              disabled={imageSaved}
+            >
+              <LinearGradient
+                colors={imageSaved ? ['#34C759', '#30B455'] : ['#34C759', '#30B455']}
+                style={styles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
               >
-                <LinearGradient
-                  colors={option.colors}
-                  style={styles.colorPreview}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                />
-                <Text style={styles.colorName}>{option.name}</Text>
-                {selectedBackground === index && (
-                  <View style={styles.selectedIndicator}>
-                    <Text style={styles.checkmark}>✓</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
+                <Text style={styles.buttonText}>
+                  {imageSaved ? '✓ Shopping Wallpaper Applied' : '🛒 Create Shopping Wallpaper'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
-        </View>
-
-        {/* Save Button */}
-        <TouchableOpacity 
-          style={[styles.saveButton, imageSaved && styles.savedButton]} 
-          onPress={saveAndApplyWallpaper}
-          disabled={imageSaved}
-        >
-          <LinearGradient
-            colors={imageSaved ? ['#34C759', '#30B455'] : ['#34C759', '#30B455']}
-            style={styles.buttonGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+        </ScrollView>
+      ) : (
+        // Non-scrollable version for 2 or fewer items
+        <>
+          <ViewShot
+            ref={viewShotRef}
+            options={{
+              format: 'png',
+              quality: 1,
+              width: IPHONE_13_WIDTH,
+              height: IPHONE_13_HEIGHT,
+            }}
+            style={styles.previewContainer}
           >
-            <Text style={styles.buttonText}>
-              {imageSaved ? '✓ Shopping Wallpaper Applied' : '🛒 Create Shopping Wallpaper'}
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+            <LinearGradient
+              colors={backgroundOptions[selectedBackground].colors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.dynamicBackground}
+            >
+              <View style={styles.widgetContainer}>
+                {/* Widget Background */}
+                <View style={styles.widgetBackground}>
+                  {/* Widget Header */}
+                  <View style={styles.widgetHeader}>
+                    <View style={styles.headerLeft}>
+                      <View style={styles.appIconContainer}>
+                        <Text style={styles.appIcon}>🛒</Text>
+                      </View>
+                      <View style={styles.headerTextContainer}>
+                        <Text style={styles.widgetTitle}>Shopping List</Text>
+                        <Text style={styles.widgetSubtitle}>{getCurrentDate()}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.moreButton}>
+                      <Text style={styles.moreButtonText}>•••</Text>
+                    </View>
+                  </View>
+
+                  {/* Shopping Stats */}
+                  <View style={styles.statsContainer}>
+                    <View style={styles.statItem}>
+                      <Text style={styles.statNumber}>{totalItems}</Text>
+                      <Text style={styles.statLabel}>Items</Text>
+                    </View>
+                    <View style={styles.statDivider} />
+                    <View style={styles.statItem}>
+                      <Text style={styles.statNumber}>{checkedItems}</Text>
+                      <Text style={styles.statLabel}>Collected</Text>
+                    </View>
+                    {urgentItems > 0 && (
+                      <>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statItem}>
+                          <Text style={[styles.statNumber, styles.urgentNumber]}>
+                            {urgentItems}
+                          </Text>
+                          <Text style={styles.statLabel}>Urgent</Text>
+                        </View>
+                      </>
+                    )}
+                  </View>
+
+                  {/* Shopping Items */}
+                  <View style={styles.widgetContent}>
+                    {groceryList.slice(0, 4).map((item, index) => {
+                      const categoryInfo = getCategoryInfo(item.category);
+                      return (
+                        <View key={item.id || index} style={styles.shoppingItem}>
+                          <View style={styles.itemCheckbox}>
+                            <View style={[
+                              styles.checkboxInner,
+                              item.checked ? styles.completedCheckbox : styles.uncompletedCheckbox
+                            ]}>
+                              {item.checked ? (
+                                <Text style={styles.checkboxCheck}>✓</Text>
+                              ) : (
+                                <View style={styles.emptyCheckbox} />
+                              )}
+                            </View>
+                          </View>
+                          
+                          <View style={styles.itemContent}>
+                            <View style={styles.itemMainContent}>
+                              <Text style={styles.categoryEmoji}>
+                                {categoryInfo.emoji}
+                              </Text>
+                              <Text 
+                                style={[
+                                  styles.itemText, 
+                                  item.checked && styles.completedItemText
+                                ]} 
+                                numberOfLines={1}
+                              >
+                                {item.name}
+                              </Text>
+                              {item.priority === 'urgent' && !item.checked && (
+                                <View style={styles.urgentIndicator}>
+                                  <Text style={styles.urgentText}>!</Text>
+                                </View>
+                              )}
+                            </View>
+                            
+                            <View style={styles.itemMeta}>
+                              <Text style={[
+                                styles.quantityText,
+                                item.checked && styles.completedQuantityText
+                              ]}>
+                                Qty: {item.quantity}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      );
+                    })}
+                    
+                    {/* Show more indicator */}
+                    {groceryList.length > 4 && (
+                      <View style={styles.moreItemsIndicator}>
+                        <Text style={styles.moreItemsText}>
+                          +{groceryList.length - 4} more items
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Widget Footer */}
+                  <View style={styles.widgetFooter}>
+                    <Text style={styles.footerText}>
+                      {Math.round((checkedItems / Math.max(totalItems, 1)) * 100)}% collected
+                      {urgentItems > 0 && ` • ${urgentItems} urgent`}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </LinearGradient>
+          </ViewShot>
+
+          {/* Controls Section - positioned absolutely for non-scroll mode */}
+          <View style={styles.buttonsContainer}>
+            {/* Background Selection */}
+            <View style={styles.colorSelectionContainer}>
+              <Text style={styles.sectionTitle}>Choose Background</Text>
+              <View style={styles.colorCards}>
+                {backgroundOptions.map((option, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.colorCard,
+                      selectedBackground === index && styles.selectedColorCard
+                    ]}
+                    onPress={() => setSelectedBackground(index)}
+                  >
+                    <LinearGradient
+                      colors={option.colors}
+                      style={styles.colorPreview}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    />
+                    <Text style={styles.colorName}>{option.name}</Text>
+                    {selectedBackground === index && (
+                      <View style={styles.selectedIndicator}>
+                        <Text style={styles.checkmark}>✓</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Save Button */}
+            <TouchableOpacity 
+              style={[styles.saveButton, imageSaved && styles.savedButton]} 
+              onPress={saveAndApplyWallpaper}
+              disabled={imageSaved}
+            >
+              <LinearGradient
+                colors={imageSaved ? ['#34C759', '#30B455'] : ['#34C759', '#30B455']}
+                style={styles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.buttonText}>
+                  {imageSaved ? '✓ Shopping Wallpaper Applied' : '🛒 Create Shopping Wallpaper'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
-}
+} // Remove the extra }; here
 
 const styles = StyleSheet.create({
   container: {

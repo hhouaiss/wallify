@@ -1,0 +1,7 @@
+{
+  "/not-found": "app/not-found.js",
+  "/welcome": "app/welcome.js",
+  "/todo": "app/todo.js",
+  "/preview": "app/preview.js",
+  "/grocery": "app/grocery.js"
+}
